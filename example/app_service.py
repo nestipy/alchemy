@@ -5,9 +5,9 @@ from nestipy.common import Injectable
 from nestipy.ioc import Inject
 from sqlalchemy.future import select
 
+from dto import CreateUserDto
 from nestipy_alchemy import SQLAlchemyService
 from user_model import User, UserModel
-from dto import CreateUserDto
 
 
 @Injectable()
