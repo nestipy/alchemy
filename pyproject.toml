@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "nestipy-alchemy"
-version = "0.1.0"
-description = ""
+version = "0.1.1"
+description = "Sqlalchemy module for nestipy framework."
 authors = ["tsiresymila <tsiresymila@gmail.com>"]
 readme = "README.md"
 
