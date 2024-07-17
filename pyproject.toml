@@ -1,13 +1,13 @@
 [tool.poetry]
 name = "nestipy-alchemy"
-version = "0.1.2"
+version = "0.1.3"
 description = "Sqlalchemy module for nestipy framework."
 authors = ["tsiresymila <tsiresymila@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-sqlalchemy = {extras = ["asyncio"], version = "^2.0.31"}
+sqlalchemy-serializer = "^1.4.22"
 
 
 [build-system]
