@@ -19,8 +19,9 @@ from .service import SQLAlchemyService
 class SQLAlchemyModule(ConfigurableModuleClass):
 
     @classmethod
-    def for_root(cls, option: SQLAlchemyOption):
+    def for_root(cls, option: SQLAlchemyOption, is_global: bool = False):
         d_module: DynamicModule = cls.for_root_app(option)
+        d_module.is_global = d_module.is_global or is_global
         return d_module
 
     @classmethod
@@ -31,7 +32,9 @@ class SQLAlchemyModule(ConfigurableModuleClass):
             existing: Union[Type, str] = None,
             use_class: Type = None,
             inject: list = None,
-            imports: list = None
+            imports: list = None,
+            is_global: bool = False
     ):
         d_module: DynamicModule = cls.for_root_app_async(value, factory, existing, use_class, inject, imports)
+        d_module.is_global = d_module.is_global or is_global
         return d_module
