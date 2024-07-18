@@ -14,7 +14,7 @@ async def sqlalchemy_option(config: Annotated[ConfigService, Inject()]) -> SQLAl
     return SQLAlchemyOption(
         url=config.get("DATABASE_URL"),
         declarative_base=Base,
-        sync=False
+        sync=False,
     )
 
 

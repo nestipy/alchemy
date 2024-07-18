@@ -11,7 +11,7 @@ class SQLAlchemyOption:
     url: Union[str, URL]
     declarative_base: Type[DeclarativeBase]
     echo: bool = False
-    sync: bool = True
+    sync: bool = False
 
 
 ConfigurableModuleClass, SQLALCHEMY_OPTION = ConfigurableModuleBuilder[SQLAlchemyOption]().set_method(
