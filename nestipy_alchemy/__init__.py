@@ -1,6 +1,4 @@
 from .converter import (
-    sqlalchemy_pydantic_loader,
-    sqlalchemy_pydantic_mapper,
     SqlAlchemyPydanticLoader,
     SqlAlchemyPydanticMapper
 )
@@ -11,8 +9,6 @@ __all__ = [
     "SQLAlchemyModule",
     "SQLAlchemyOption",
     "SQLAlchemyService",
-    "sqlalchemy_pydantic_loader",
-    "sqlalchemy_pydantic_mapper",
     "SqlAlchemyPydanticLoader",
     "SqlAlchemyPydanticMapper"
 ]
