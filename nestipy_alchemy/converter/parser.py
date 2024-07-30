@@ -1,5 +1,5 @@
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, time, timedelta
 from types import NoneType
 from typing import List, Callable, Any, Dict, cast, Mapping, Tuple, Literal, Union
 
@@ -44,6 +44,16 @@ class SqlAlchemyPydanticLoader:
             return data
         return pydantic_model.model_validate(data)
 
+    @classmethod
+    def _convert(cls, obj: Any) -> Any:
+        if isinstance(obj, datetime):
+            return obj.isoformat(timespec="seconds")
+        if isinstance(obj, time):
+            return obj.isoformat(timespec="seconds")
+        if isinstance(obj, timedelta):
+            return str(obj)
+        return obj
+
     def _serialize_sync(self, db_instance: Any, pydantic_model: BaseModel, depth: int = 3) -> Dict[str, Any]:
         if depth <= 0:
             return {}
@@ -53,7 +63,7 @@ class SqlAlchemyPydanticLoader:
         for column_name, column_key in mapper.columns.items():
             if column_name in fields:
                 value = getattr(db_instance, column_name)
-                data[column_name] = value
+                data[column_name] = self._convert(value)
 
         for field_name, field_type in mapper.relationships.items():
             if field_name not in fields:
@@ -103,7 +113,7 @@ class SqlAlchemyPydanticLoader:
         for column_name, column_key in mapper.columns.items():
             if column_name in fields:
                 value = getattr(db_instance, column_name)
-                data[column_name] = value
+                data[column_name] = self._convert(value)
 
         for field_name, field_type in mapper.relationships.items():
             if field_name not in fields:
