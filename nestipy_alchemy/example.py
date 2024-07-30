@@ -43,9 +43,9 @@ async def test_with_async():
     async with AsyncSession(bind=engine) as session:
         sqlalchemy_pydantic_loader = SqlAlchemyPydanticLoader(
             _mapper=sqlalchemy_pydantic_mapper,
-            async_session_callback=lambda: session
+            async_bind_factory=lambda: session
         )
-        stmt = select(Employee)
+        stmt = select(Department)
         result = await session.execute(stmt)
         all_employee = result.scalars().all()
         for employee in all_employee:
@@ -66,7 +66,7 @@ def test_with_sync():
             _mapper=sqlalchemy_pydantic_mapper,
             session=session
         )
-        stmt = select(Employee)
+        stmt = select(Department)
         result = session.execute(stmt)
         all_employee = result.scalars().all()
         for employee in all_employee:

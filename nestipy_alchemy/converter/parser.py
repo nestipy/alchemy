@@ -23,11 +23,11 @@ class SqlAlchemyPydanticLoader:
             self,
             _mapper: "SqlAlchemyPydanticMapper",
             session: Session = None,
-            async_session_context: Callable[[], AsyncSession] = None
+            async_bind_factory: Callable[[], AsyncSession] = None
     ):
         self._mapper = _mapper
         self.session = session
-        self.async_session_context = async_session_context
+        self.async_bind_factory = async_bind_factory
 
     def load_sync(
             self, db_instance: Any,
@@ -55,8 +55,8 @@ class SqlAlchemyPydanticLoader:
                 value = getattr(db_instance, column_name)
                 data[column_name] = value
 
-        for field_name, field_type in mapper.all_orm_descriptors.items():
-            if field_name not in fields or not isinstance(field_type.property, RelationshipProperty):
+        for field_name, field_type in mapper.relationships.items():
+            if field_name not in fields:
                 continue
             value = getattr(db_instance, field_name)
             if isinstance(value, list):
@@ -105,10 +105,10 @@ class SqlAlchemyPydanticLoader:
                 value = getattr(db_instance, column_name)
                 data[column_name] = value
 
-        for field_name, field_type in mapper.all_orm_descriptors.items():
-            if field_name not in fields or not isinstance(field_type.property, RelationshipProperty):
+        for field_name, field_type in mapper.relationships.items():
+            if field_name not in fields:
                 continue
-            value = await self.relationship_resolver_for(db_instance, field_type.property)
+            value = await self.relationship_resolver_for(db_instance, field_type)
             if isinstance(value, list):
                 if depth - 1 == 0:
                     data[field_name] = []
@@ -117,7 +117,7 @@ class SqlAlchemyPydanticLoader:
                         await self._serialize(item, self._mapper.mapped_types.get(
                             getattr(item, "__pydantic_name__", type(item).__name__)
                         ), depth - 1) for item in
-                        value[0]
+                        (value[0] if isinstance(value, list) else value)
                     ]
             elif not isinstance(value, self._default_python):
                 if depth - 1 == 0:
@@ -190,8 +190,8 @@ class SqlAlchemyPydanticLoader:
             ]
 
     async def _scalars_all(self, *args, **kwargs):
-        if self.async_session_context:
-            async with self.async_session_context() as bind:
+        if self.async_bind_factory:
+            async with self.async_bind_factory() as bind:
                 return (await bind.scalars(*args, **kwargs)).all()
         else:
             assert self.session is not None, "No session binding"
