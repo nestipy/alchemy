@@ -6,8 +6,8 @@ from sqlalchemy import String, ForeignKey, select, create_engine
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import declarative_base, Mapped, mapped_column, relationship, DeclarativeBase, Session
 
-from parser import SqlAlchemyPydanticLoader
-from mapper import SqlAlchemyPydanticMapper
+from converter.parser import SqlAlchemyPydanticLoader
+from converter.mapper import SqlAlchemyPydanticMapper
 
 Base: DeclarativeBase = declarative_base()
 

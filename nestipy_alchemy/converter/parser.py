@@ -1,7 +1,7 @@
 from collections import defaultdict
 from datetime import datetime
 from types import NoneType
-from typing import List, Callable, Any, Dict, cast, Mapping, Tuple
+from typing import List, Callable, Any, Dict, cast, Mapping, Tuple, Literal, Union
 
 from pydantic import BaseModel
 from sqlalchemy import select, inspect, tuple_
@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapper, InstanceState, MANYTOONE
 from sqlalchemy.orm import RelationshipProperty, Session
 
-from mapper import SqlAlchemyPydanticMapper
+from .mapper import SqlAlchemyPydanticMapper
 
 
 class SqlAlchemyPydanticLoader:
@@ -29,14 +29,20 @@ class SqlAlchemyPydanticLoader:
         self.session = session
         self.async_session_context = async_session_context
 
-    def load_sync(self, db_instance: Any, depth: int = 5) -> BaseModel:
+    def load_sync(
+            self, db_instance: Any,
+            depth: int = 5,
+            mode: Literal["json", "model"] = "model"
+    ) -> Union[BaseModel, dict[str, Any]]:
         model = type(db_instance)
         schema_name = getattr(model, "__pydantic_name__", model.__name__)
         pydantic_model = self._mapper.mapped_types.get(schema_name)
         if not pydantic_model:
             pydantic_model = self._mapper.type(model)(type(schema_name, (), {}))
         data = self._serialize_sync(db_instance, pydantic_model, depth)
-        return pydantic_model.model_validate(data, context="test")
+        if mode == "json":
+            return data
+        return pydantic_model.model_validate(data)
 
     def _serialize_sync(self, db_instance: Any, pydantic_model: BaseModel, depth: int = 3) -> Dict[str, Any]:
         if depth <= 0:
@@ -73,14 +79,20 @@ class SqlAlchemyPydanticLoader:
 
         return data
 
-    async def load(self, db_instance: Any, depth: int = 5) -> BaseModel:
+    async def load(
+            self, db_instance: Any,
+            depth: int = 5,
+            mode: Literal["json", "model"] = "model"
+    ) -> Union[BaseModel, dict[str, Any]]:
         model = type(db_instance)
         schema_name = getattr(model, "__pydantic_name__", model.__name__)
         pydantic_model = self._mapper.mapped_types.get(schema_name)
         if not pydantic_model:
             pydantic_model = self._mapper.type(model)(type(schema_name, (), {}))
         data = await self._serialize(db_instance, pydantic_model, depth)
-        return pydantic_model.model_validate(data, context="test")
+        if mode == "json":
+            return data
+        return pydantic_model.model_validate(data)
 
     async def _serialize(self, db_instance: Any, pydantic_model: BaseModel, depth: int = 3) -> Dict[str, Any]:
         if depth <= 0:
