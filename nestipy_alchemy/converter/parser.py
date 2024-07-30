@@ -31,7 +31,7 @@ class SqlAlchemyPydanticLoader:
 
     def load_sync(
             self, db_instance: Any,
-            depth: int = 5,
+            depth: int = 3,
             mode: Literal["json", "model"] = "model"
     ) -> Union[BaseModel, dict[str, Any]]:
         model = type(db_instance)
@@ -117,7 +117,7 @@ class SqlAlchemyPydanticLoader:
                         await self._serialize(item, self._mapper.mapped_types.get(
                             getattr(item, "__pydantic_name__", type(item).__name__)
                         ), depth - 1) for item in
-                        (value[0] if isinstance(value, list) else value)
+                        (value[0] if isinstance(value[0], list) else value)
                     ]
             elif not isinstance(value, self._default_python):
                 if depth - 1 == 0:
