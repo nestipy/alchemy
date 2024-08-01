@@ -1,5 +1,5 @@
 from .mapper import SqlAlchemyPydanticMapper
-from .parser import SqlAlchemyPydanticLoader
+from .loader import SqlAlchemyPydanticLoader
 
 __all__ = [
     "SqlAlchemyPydanticMapper",

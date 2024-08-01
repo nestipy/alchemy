@@ -31,7 +31,7 @@ class SqlAlchemyPydanticLoader:
 
     def load_sync(
             self, db_instance: Any,
-            depth: int = 3,
+            depth: int = 2,
             mode: Literal["json", "model"] = "model"
     ) -> Union[BaseModel, dict[str, Any]]:
         model = type(db_instance)
@@ -91,7 +91,7 @@ class SqlAlchemyPydanticLoader:
 
     async def load(
             self, db_instance: Any,
-            depth: int = 5,
+            depth: int = 2,
             mode: Literal["json", "model"] = "model"
     ) -> Union[BaseModel, dict[str, Any]]:
         model = type(db_instance)
@@ -162,10 +162,10 @@ class SqlAlchemyPydanticLoader:
                 else:
                     return None
 
-            related_objects = await self.loader_for(_relationship, [_relationship_key])
+            related_objects = await self._loader_for(_relationship, [_relationship_key])
         return related_objects[0] if _relationship.direction == MANYTOONE else related_objects
 
-    async def loader_for(
+    async def _loader_for(
             self,
             _relationship: RelationshipProperty,
             keys: List[Tuple]

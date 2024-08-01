@@ -12,7 +12,6 @@ from .builder import SQLAlchemyOption, SQLALCHEMY_OPTION
 class SQLAlchemyService(OnInit, OnDestroy):
     _option: Annotated[SQLAlchemyOption, Inject(SQLALCHEMY_OPTION)]
     _engine: AsyncEngine = None
-    _session: AsyncSession = None
 
     async def on_startup(self):
         if not self._engine:
@@ -28,9 +27,7 @@ class SQLAlchemyService(OnInit, OnDestroy):
 
     @property
     def session(self) -> AsyncSession:
-        if not self._session:
-            self._session = AsyncSession(self._engine)
-        return self._session
+        return AsyncSession(self._engine)
 
     @property
     def engine(self) -> AsyncEngine:
